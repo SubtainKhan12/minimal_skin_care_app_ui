@@ -40,30 +40,27 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class HomeScreen extends StatefulWidget {
+class HomePage extends StatefulWidget { 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomePageState extends State<HomePage> {
   final ScrollController _scrollController = ScrollController();
-  bool _isVisible = false; // start hidden
+  bool _isVisible = true; // AppBar & BottomNav visibility
   int _selectedIndex = 0;
 
   @override
   void initState() {
     super.initState();
 
-    // Delay to trigger entrance animation
-    Future.delayed(const Duration(milliseconds: 200), () {
-      if (mounted) setState(() => _isVisible = true);
-    });
-
-    // Scroll listener
+    // Scroll listener for hiding/showing AppBar & BottomNav
     _scrollController.addListener(() {
-      if (_scrollController.position.userScrollDirection == ScrollDirection.reverse) {
+      if (_scrollController.position.userScrollDirection ==
+          ScrollDirection.reverse) {
         if (_isVisible) setState(() => _isVisible = false);
-      } else if (_scrollController.position.userScrollDirection == ScrollDirection.forward) {
+      } else if (_scrollController.position.userScrollDirection ==
+          ScrollDirection.forward) {
         if (!_isVisible) setState(() => _isVisible = true);
       }
     });
@@ -80,49 +77,12 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          Container(
-            color: Color(0xFFCF8F3),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    children: [
-                      // Welcome Section
-                      Container(
-                        color: primaryColor,
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        child: Column(
-                          children: [
-                            SizedBox(height: 60),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Icon(Icons.menu, size: 40, color: Colors.white),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 18.0),
-                                  child: Column(
-                                    // crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: const [
-                                      CustomText2(text: "Welcome Back", fontSize: 16, color: Colors.white),
-                                      CustomText2(text: "Kate Michael", fontSize: 23, color: Colors.white),
-                                    ],
-                                  ),
-                                ),
-                                const CustomCircleImage(imageUrl: "https://randomuser.me/api/portraits/women/21.jpg"),
-                              ],
-                            ),
-                            SizedBox(height: 20),
-                          ],
-                        ),
-                      ),
-
-                      Expanded(
-                        child: SingleChildScrollView(
-                          controller: _scrollController,
-                          padding: EdgeInsets.only(bottom: 100),
-
-                          child: Column(
+          // Main scrollable content (constrained to Stack via Positioned.fill)
+          Positioned.fill(
+            child: SingleChildScrollView(
+              controller: _scrollController,
+              padding: EdgeInsets.only(top: 110, bottom: 120),
+              child: Column(
                             children: [
                               SizedBox(height: 20),
                               Padding(
@@ -300,45 +260,90 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             ],
                           ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
             ),
           ),
-          // Floating Bottom Navigation Bar
+          // Animated AppBar
           Positioned(
             left: 0,
             right: 0,
-            bottom: 20,
-            child: AnimatedSlide(
-              duration: const Duration(milliseconds: 1100),
-              offset: _isVisible ? Offset(0, 0) : Offset(0, 2),
-              curve: Curves.easeInOut,
-              child: AnimatedOpacity(
-                duration: const Duration(milliseconds: 1100),
-                opacity: _isVisible ? 1 : 0,
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 25),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.8),
-                    borderRadius: BorderRadius.circular(90),
-                    boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, 4))],
-                  ),
-                  child: CustomBottomNavBar(
-                    currentIndex: _selectedIndex,
-                    onTap: (index) {
-                      setState(() {
-                        _selectedIndex = index;
-                      });
-                    },
+            top: 0,
+            child:  AnimatedSlide(
+                duration: const Duration(milliseconds: 500),
+                offset: _isVisible ? Offset(0, 0) : Offset(0, -1),
+                curve: Curves.easeInOut,
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 500),
+                  opacity: _isVisible ? 1 : 0,
+                  child: Container(
+                    height: 100,
+                    padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                    color: primaryColor,
+                    child: Column(
+                      children: [
+                        SizedBox(height: 40),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Icon(
+                              Icons.menu,
+                              size: 30,
+                              color: Colors.white,
+                            ),
+                            CustomText2(
+                              text: "Kate Michael",
+                              fontSize: 20,
+                              color: Colors.white,
+                            ),
+                            const CustomCircleImage(
+                              imageUrl: "https://randomuser.me/api/portraits/women/21.jpg",
+                              size: 40,
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 6),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
+          
           ),
+
+          // Animated BottomNavigationBar
+          Positioned(
+          left: 0,
+          right: 0,
+          bottom: 20,
+          child: AnimatedSlide(
+            duration: const Duration(milliseconds: 500),
+            offset: _isVisible ? Offset(0, 0) : Offset(0, 2),
+            curve: Curves.easeInOut,
+            child: AnimatedOpacity(
+              duration: const Duration(milliseconds: 500),
+              opacity: _isVisible ? 1 : 0,
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 25),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.8),
+                  borderRadius: BorderRadius.circular(90),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 10,
+                        offset: Offset(0, 4))
+                  ],
+                ),
+                child: CustomBottomNavBar(
+                  currentIndex: _selectedIndex,
+                  onTap: (index) {
+                    setState(() {
+                      _selectedIndex = index;
+                    });
+                  },
+                ),
+              ),
+            ),
+          ),),
         ],
       ),
     );
